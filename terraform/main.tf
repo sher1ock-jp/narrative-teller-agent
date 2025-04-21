@@ -39,3 +39,9 @@ resource "google_project_iam_member" "cloud_run_sql_client" {
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:${google_service_account.run_sa.email}"
 }
+
+# Enable Cloud Build API
+resource "google_project_service" "cloudbuild" {
+  project = var.project_id
+  service = "cloudbuild.googleapis.com"
+}
