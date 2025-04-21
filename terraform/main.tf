@@ -1,3 +1,12 @@
+terraform {
+  backend "remote" {
+    organization = "sher1ock"
+    workspaces {
+      name = "narrative-teller-agent"
+    }
+  }
+}
+
 resource "google_project_service" "sqladmin" {
   service = "sqladmin.googleapis.com"
 }
