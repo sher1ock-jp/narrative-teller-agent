@@ -21,4 +21,4 @@ COPY . ${ROOT_DIR}/
 
 # 4) ポート解放 & 起動
 EXPOSE 8080
-CMD ["sh", "-c", "uv run main.py --host 0.0.0.0 --port $PORT"]
+CMD ["sh", "-c", "uv run main.py"]
