@@ -2,20 +2,28 @@ FROM python:3.13-slim
 
 ARG ROOT_DIR=/app
 ENV ROOT_DIR=${ROOT_DIR}
+ENV PYTHONPATH=${ROOT_DIR}
 
 WORKDIR ${ROOT_DIR}
 
-# 1) 依存定義のみ先にコピー
-COPY pyproject.toml ${ROOT_DIR}/
+# 1) 依存定義＋lock を先にコピーしてキャッシュ効かせる
+COPY agents/pyproject.toml agents/uv.lock ./
 
-# 2) pip → uvCLI → 依存解決
+# 2) uv CLI を使って依存を同期
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir uv \
     && uv sync
 
 # 3) 残りのソースをコピー
-COPY . ${ROOT_DIR}/
+COPY agents/ ./
 
-# 4) ポート解放 & 起動
+# 4) OpenAI API キーをビルド／実行時に渡す
+ARG OPENAI_API_KEY
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+
+# 5) ポート宣言
 EXPOSE 8080
-CMD ["sh", "-c", "uv run main.py --host 0.0.0.0 --port $PORT"]
+ENV PORT=8080
+
+# 6) コンテナ起動
+CMD ["sh","-c","uv run main.py --host 0.0.0.0 --port $PORT"]
