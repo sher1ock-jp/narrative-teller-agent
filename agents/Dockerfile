@@ -2,6 +2,7 @@ FROM python:3.13-slim
 
 ARG ROOT_DIR=/app
 ENV ROOT_DIR=${ROOT_DIR}
+ENV PYTHONPATH=${ROOT_DIR}
 
 WORKDIR ${ROOT_DIR}
 
@@ -21,4 +22,5 @@ COPY . ${ROOT_DIR}/
 
 # 4) ポート解放 & 起動
 EXPOSE 8080
-CMD ["sh", "-c", "cd agents && uv run main.py"]
+ENV PORT=8080
+CMD ["sh", "-c", "cd agents && python main.py"]
