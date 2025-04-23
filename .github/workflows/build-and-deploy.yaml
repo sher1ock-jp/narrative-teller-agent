@@ -25,8 +25,8 @@ jobs:
         run: |
           docker build \
             --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-            -f agents/Dockerfile \
-            -t asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest .
+            --tag asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest \
+            -f agents/Dockerfile .
 
       # コンテナレジストリにプッシュ
       - name: Push to GCR
