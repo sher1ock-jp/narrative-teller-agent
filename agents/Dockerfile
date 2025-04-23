@@ -11,11 +11,9 @@ COPY agents/pyproject.toml ${ROOT_DIR}/pyproject.toml
 
 # 2) 依存関係のインストール - 必要なパッケージを明示的にインストール
 RUN pip install --upgrade pip \
-    && pip install --no-cache-dir uv \
-    && pip install --no-cache-dir fastapi uvicorn python-dotenv openai google-adk \
-    && uv pip sync pyproject.toml
+    && pip install --no-cache-dir fastapi==0.115.12 uvicorn==0.34.2 python-dotenv openai google-adk==0.2.0 litellm==1.67.0
 
-# OPENAI APIキー環境変数設定（必要であれば）
+# OPENAI APIキー環境変数設定
 ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
