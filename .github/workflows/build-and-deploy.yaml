@@ -46,6 +46,7 @@ jobs:
           gcloud run deploy manga-agent \
             --image asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest \
             --region=asia-northeast1 \
+            --memory 1Gi \
             --set-env-vars OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
             --platform=managed \
-            --quiet
+            --quiet 
