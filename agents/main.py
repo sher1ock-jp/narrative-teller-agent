@@ -24,11 +24,6 @@ app: FastAPI = get_fast_api_app(
     web=True,
 )
 
-# ルートURLのエンドポイントを明示的に追加
-@app.get("/")
-async def root():
-    return {"message": "Welcome to Manga Agent API", "status": "running"}
-
 if __name__ == "__main__":
     # Get port from environment variable or default to 8080
     port = int(os.environ.get("PORT", 8080))
