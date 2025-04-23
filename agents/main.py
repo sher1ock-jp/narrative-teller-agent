@@ -1,7 +1,13 @@
 import os
 import uvicorn
+import openai
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from google.adk.cli.fast_api import get_fast_api_app
+
+load_dotenv()
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Directory containing this file
 AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,5 +24,4 @@ app: FastAPI = get_fast_api_app(
     web=True,
 )
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
