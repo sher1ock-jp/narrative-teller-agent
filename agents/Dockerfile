@@ -6,7 +6,7 @@ ENV ROOT_DIR=${ROOT_DIR}
 WORKDIR ${ROOT_DIR}
 
 # 1) 依存定義のみ先にコピー
-COPY agents/pyproject.toml /app/
+COPY agents/pyproject.toml ${ROOT_DIR}/
 
 # 2) pip → uvCLI → 依存解決
 RUN pip install --upgrade pip \
@@ -17,8 +17,11 @@ ARG OPENAI_API_KEY
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
 # 3) 残りのソースをコピー
-COPY . ${ROOT_DIR}/
+COPY agents/ ${ROOT_DIR}/
 
 # 4) ポート解放 & 起動
 EXPOSE 8080
-CMD ["sh", "-c", "cd agents && python main.py"]
+ENV PORT=8080
+
+# Cloud Runに必要なポート8080で起動するよう明示
+CMD ["python", "main.py"]
