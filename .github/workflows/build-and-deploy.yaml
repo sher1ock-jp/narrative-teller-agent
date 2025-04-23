@@ -15,6 +15,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      # Docker 認証を設定
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+
       # Docker イメージビルド（ビルド引数でキーを渡す）
       - name: Build Docker
         run: |
