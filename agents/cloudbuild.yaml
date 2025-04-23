@@ -1,0 +1,27 @@
+# cloudbuild.yaml
+substitutions:
+  _REGION: asia-northeast1
+  _REPOSITORY: manga-agent-repo
+
+steps:
+  # 1) Docker イメージをビルド＋タグ付け
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'ROOT_DIR=/app'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/manga-agent:latest'
+      - '.'
+    env:
+      - 'GOOGLE_CLOUD_PROJECT=${PROJECT_ID}'
+      - 'GOOGLE_CLOUD_REGION=${_REGION}'
+
+  # 2) Artifact Registry へプッシュ
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/manga-agent:latest'
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/manga-agent:latest'
