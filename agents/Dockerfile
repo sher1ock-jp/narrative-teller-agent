@@ -13,6 +13,9 @@ RUN pip install --upgrade pip \
     && pip install --no-cache-dir uv \
     && uv sync
 
+ARG OPENAI_API_KEY
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+
 # 3) 残りのソースをコピー
 COPY . ${ROOT_DIR}/
 

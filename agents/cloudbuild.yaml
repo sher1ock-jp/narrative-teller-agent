@@ -9,9 +9,9 @@ steps:
     args:
       - 'build'
       - '--build-arg'
-      - 'ROOT_DIR=/app'
+      - 'OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}}'
       - '-t'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/manga-agent:latest'
+      - 'gcr.io/$PROJECT_ID/narrative-teller-agent'
       - '.'
     env:
       - 'GOOGLE_CLOUD_PROJECT=${PROJECT_ID}'
@@ -21,7 +21,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/manga-agent:latest'
+      - 'gcr.io/$PROJECT_ID/narrative-teller-agent'
 
 images:
-  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/manga-agent:latest'
+  - 'gcr.io/$PROJECT_ID/narrative-teller-agent'
