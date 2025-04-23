@@ -9,11 +9,15 @@ WORKDIR ${ROOT_DIR}
 # 1) 依存定義ファイルを先にコピー
 COPY agents/pyproject.toml ${ROOT_DIR}/pyproject.toml
 
-# 2) 依存関係のインストール - google-adkが確実にインストールされるようにする
+# 2) 依存関係のインストール - 必要なパッケージを明示的にインストール
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir uv \
     && pip install --no-cache-dir fastapi uvicorn python-dotenv openai google-adk \
-    && uv pip install -e .
+    && uv pip sync pyproject.toml
+
+# OPENAI APIキー環境変数設定（必要であれば）
+ARG OPENAI_API_KEY
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
 # 3) アプリケーションのソースコードをコピー
 COPY agents/main.py ${ROOT_DIR}/
