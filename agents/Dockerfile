@@ -6,7 +6,7 @@ ENV ROOT_DIR=${ROOT_DIR}
 WORKDIR ${ROOT_DIR}
 
 # 1) 依存定義のみ先にコピー
-COPY pyproject.toml ${ROOT_DIR}/
+COPY agents/pyproject.toml /app/
 
 # 2) pip → uvCLI → 依存解決
 RUN pip install --upgrade pip \
