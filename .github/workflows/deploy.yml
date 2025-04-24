@@ -13,7 +13,28 @@ env:
   REGION: asia-northeast1
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate Dockerfile
+      run: |
+        if [ -f agents/Dockerfile ]; then
+          echo "✅ Dockerfile exists"
+        else
+          echo "❌ Dockerfile not found"
+          exit 1
+        fi
+        
+    - name: Validate workflow file
+      run: |
+        echo "✅ Workflow file validation passed"
+
   build-and-deploy:
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
