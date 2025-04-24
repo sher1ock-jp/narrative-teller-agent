@@ -13,15 +13,19 @@
 
 GitHub Actionsで使用するために、以下のシークレットをリポジトリに設定する必要があります：
 
-- `GCP_PROJECT_ID`: Google CloudプロジェクトのプロジェクトID
-- `GCP_WORKLOAD_IDENTITY_PROVIDER`: Workload Identity Federationのプロバイダー
-- `GCP_SERVICE_ACCOUNT`: デプロイに使用するサービスアカウントのメールアドレス
+- `GCP_SA_KEY`: Google Cloudサービスアカウントのキー（JSON形式）
 - `OPENAI_API_KEY`: OpenAI APIキー
-- `CLOUD_SQL_CONNECTION_STRING`: Cloud SQLへの接続文字列（例：`postgresql://user:password@host:port/database`）
+
+環境変数として直接設定されている値：
+- プロジェクトID: `manga-agent-457407`
+- サービス名: `manga-agents`
+- リージョン: `asia-northeast1`
+- Artifact Repository: `manga-agent-repo`
+- Cloud SQL接続文字列: `postgresql+pg8000://app_user:Takayuki123@/manga_db?unix_sock=/cloudsql/manga-agent-457407:asia-northeast1:manga-agent-sql/.s.PGSQL.5432`
 
 ## ワークフローの設定
 
-`.github/workflows/deploy.yml`ファイルには、以下の主要なステップが含まれています：
+`.github/workflows/build-and-deploy.yaml`ファイルには、以下の主要なステップが含まれています：
 
 1. コードのチェックアウト
 2. Google Cloud認証
@@ -112,13 +116,9 @@ gcloud sql users create manga-agent-user \
 
 GitHubリポジトリの「Settings」→「Secrets and variables」→「Actions」で以下のシークレットを設定します：
 
-1. `GCP_PROJECT_ID`: Google CloudプロジェクトのプロジェクトID
-2. `GCP_WORKLOAD_IDENTITY_PROVIDER`: Workload Identity Providerの完全なリソース名
-   例: `projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider`
-3. `GCP_SERVICE_ACCOUNT`: サービスアカウントのメールアドレス
-   例: `github-actions-sa@PROJECT_ID.iam.gserviceaccount.com`
-4. `OPENAI_API_KEY`: OpenAI APIキー
-5. `CLOUD_SQL_CONNECTION_STRING`: Cloud SQLへの接続文字列
+1. `GCP_SA_KEY`: Google Cloudサービスアカウントのキー（JSON形式）
+   例: 提供されたサービスアカウントキーのJSON
+2. `OPENAI_API_KEY`: OpenAI APIキー
 
 ## デプロイの確認
 
