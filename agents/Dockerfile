@@ -12,6 +12,7 @@ COPY agents/pyproject.toml agents/uv.lock ./
 # 2) uv CLI を使って依存を同期
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir uv \
+    && uv add uvicorn \
     && uv sync
 
 # 3) 残りのソースをコピー
@@ -26,4 +27,4 @@ EXPOSE 8080
 ENV PORT=8080
 
 # 6) コンテナ起動
-CMD sh -c "uvicorn main:app --host 0.0.0.0 --port $PORT"
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
