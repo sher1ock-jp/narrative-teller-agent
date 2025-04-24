@@ -19,7 +19,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Validate Dockerfile
       run: |
         if [ -f agents/Dockerfile ]; then
@@ -28,7 +28,7 @@ jobs:
           echo "❌ Dockerfile not found"
           exit 1
         fi
-        
+
     - name: Validate workflow file
       run: |
         echo "✅ Workflow file validation passed"
@@ -92,7 +92,7 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/manga-agent:${{ github.sha }}
           env_vars: |
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            SESSION_DB_URL=postgresql+pg8000://app_user:Takayuki123@/manga_db?unix_sock=/cloudsql/${{ env.PROJECT_ID }}:${{ env.REGION }}:manga-agent-sql/.s.PGSQL.5432
+            SESSION_DB_URL=${{ secrets.DATABASE_URL }}
 
       - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}       
+        run: echo ${{ steps.deploy.outputs.url }}

@@ -21,7 +21,6 @@ GitHub Actionsで使用するために、以下のシークレットをリポジ
 - サービス名: `manga-agents`
 - リージョン: `asia-northeast1`
 - Artifact Repository: `manga-agent-repo`
-- Cloud SQL接続文字列: `postgresql+pg8000://app_user:Takayuki123@/manga_db?unix_sock=/cloudsql/manga-agent-457407:asia-northeast1:manga-agent-sql/.s.PGSQL.5432`
 
 ## ワークフローの設定
 
@@ -119,6 +118,8 @@ GitHubリポジトリの「Settings」→「Secrets and variables」→「Action
 1. `GCP_SA_KEY`: Google Cloudサービスアカウントのキー（JSON形式）
    例: 提供されたサービスアカウントキーのJSON
 2. `OPENAI_API_KEY`: OpenAI APIキー
+3. `CLOUD_SQL_CONNECTION_STRING`: Cloud SQLへの接続文字列
+   例: `postgresql+pg8000://app_user:password@/manga_db?unix_sock=/cloudsql/PROJECT_ID:REGION:INSTANCE_NAME/.s.PGSQL.5432`
 
 ## デプロイの確認
 
