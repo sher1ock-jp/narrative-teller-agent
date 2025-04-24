@@ -1,54 +1,98 @@
-name: Build & Deploy
+name: Build & Deploy to Cloud Run
 
 on:
   push:
     branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: manga-agent-457407
+  SERVICE_NAME: manga-agents
+  REGION: asia-northeast1
+  REPOSITORY: manga-agent-repo
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate Dockerfile
+      run: |
+        if [ -f agents/Dockerfile ]; then
+          echo "✅ Dockerfile exists"
+        else
+          echo "❌ Dockerfile not found"
+          exit 1
+        fi
+        
+    - name: Validate workflow file
+      run: |
+        echo "✅ Workflow file validation passed"
 
-      # GCP 認証（必要に応じて）
-      - uses: google-github-actions/auth@v1
+  build:
+    needs: validate
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
       # Docker 認証を設定
       - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       # Docker イメージビルド（ビルド引数でキーを渡す）
-      - name: Build Docker
+      - name: Build and Push Container
         run: |
           docker build \
             --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-            --tag asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/manga-agent:${{ github.sha }} \
             -f agents/Dockerfile .
-
-      # コンテナレジストリにプッシュ
-      - name: Push to GCR
-        run: docker push asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/manga-agent:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: google-github-actions/auth@v1
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
       # Cloud Run へデプロイ（実行時環境変数としてキーを設定）
       - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy manga-agent \
-            --image asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest \
-            --region=asia-northeast1 \
-            --memory 1Gi \
-            --set-env-vars OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},SESSION_DB_URL=${{ secrets.DATABASE_URL }} \
-            --allow-unauthenticated \
-            --add-cloudsql-instances manga-agent-457407:asia-northeast1:manga-agent-sql \
-            --platform=managed \
-            --quiet 
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/manga-agent:${{ github.sha }}
+          env_vars: |
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            SESSION_DB_URL=${{ secrets.CLOUD_SQL_CONNECTION_STRING }}
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }} 
