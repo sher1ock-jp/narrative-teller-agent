@@ -47,6 +47,8 @@ jobs:
             --image asia-northeast1-docker.pkg.dev/$GCP_PROJECT/manga-agent-repo/manga-agent:latest \
             --region=asia-northeast1 \
             --memory 1Gi \
-            --set-env-vars OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+            --set-env-vars OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},SESSION_DB_URL=${{ secrets.DATABASE_URL }} \
+            --allow-unauthenticated \
+            --add-cloudsql-instances manga-agent-457407:asia-northeast1:manga-agent-sql \
             --platform=managed \
             --quiet 
